@@ -8,14 +8,8 @@ import './text-updater-node.css';
 import DropDownNode from './DropDownNode';
 import WorkFlowLabelsEnum from './enums/WorkFlowLabelsEnum';
 import WorkFlowConfigurationOptionsEnum from './enums/WorkFlowConfigurationOptionsEnum';
+import { Box, FormControl, InputLabel, MenuItem, Select } from '@mui/material';
  
-// const initialNodes = [
-//       { id: '0', position: { x: 0, y: 0 }, type:'input' , data: { label: 'Create Work Order' } },
-//       { id: '1', type: 'textUpdater', position: { x: 0, y: 200 }, data: { label:WorkFlowLabelsEnum.LOAD_TYPE, value: '',setFlowData }},
-//       { id: '2', type: 'textUpdater', position: { x: 0, y: 400 }, data: { label:WorkFlowLabelsEnum.BUDGET, value: 0,setFlowData }},
-     
-//     ];
-// const initialEdges = [{ id: 'e0-1', source: '0', target: '1' },{id:'e1-2', source:'1', target:'2'}];
 const nodeTypes = { textUpdater: TextUpdaterNode,dropDownNode:DropDownNode };
  
 const App= ()=> {
@@ -24,7 +18,7 @@ const App= ()=> {
   const [isDeleteNodeDisabled,setIsDeleteNodeDisabled]= useState(true);
   const [isFinishDisabled,setIsFinishDisabled]= useState(true);
   const [selectedConfiguration,setSelectedConfiguration]= useState('');
-  const [flowData,setFlowData]= useState({});//we will be storing the values we are getting from the flow
+  const [flowData,setFlowData]= useState({[WorkFlowLabelsEnum.CONFIGURATION]:[]});//we will be storing the values we are getting from the flow
   //{'LOAD_TYPE':LCL, 'BUDGET':5000, 'CONFIGURATION':[]}
 
   useEffect(()=>{
@@ -47,7 +41,6 @@ const App= ()=> {
       setIsDeleteNodeDisabled(true);
       setIsFinishDisabled(true);
     }
-    console.log(edges);
   },[nodes])
 
   const defaultEdgeOptions = { animated: true };
@@ -64,7 +57,7 @@ const App= ()=> {
       //when we add new configuraion node the dropdown list in the last one needs to be disabled otherwise options will be same
       if(selectedConfiguration.length) nodes[nodes.length-1].data.editable=false; 
 
-      const options=[...filterDropDownOptions];
+      const options=filterDropDownOptions();
       const newNode= {id:`${nodes.length}`,
       type:'dropDownNode', 
       position:{x:0, y:nodes[nodes.length-1].position.y+200}, 
@@ -78,7 +71,7 @@ const App= ()=> {
  const filterDropDownOptions=()=>{
     const availableConfigurations= Object.values(WorkFlowConfigurationOptionsEnum);
     const selectedConfigurations= [...flowData[WorkFlowLabelsEnum.CONFIGURATION]];
-    selectedConfiguration.array.forEach(element => {
+    selectedConfigurations.forEach(element => {
       availableConfigurations.filter((item)=> item===element)
     });
     return availableConfigurations;
@@ -89,12 +82,15 @@ const App= ()=> {
  }
  const saveWorkFlow=()=>{
   setFlowData((prevData)=> {
-    const newConfiguration= (WorkFlowLabelsEnum.CONFIGURATION in prevData)? 
-              [...prevData[WorkFlowLabelsEnum.CONFIGURATION],selectedConfiguration]:[selectedConfiguration] ;
+    const newConfiguration=  [...prevData[WorkFlowLabelsEnum.CONFIGURATION],selectedConfiguration];
     return ({...prevData,[WorkFlowLabelsEnum.CONFIGURATION]:newConfiguration})
   })
 
  }
+//  const [val,setVal]=useState('');
+//  const handleChange=(event)=>{
+//     setVal(event.target.value);
+//  }
  
   return (
     <div style={{display:'flex'}}>
@@ -113,6 +109,21 @@ const App= ()=> {
         <button onClick={addConfigurationNode}>Add</button>
         <button onClick={deleteConfigurationNode} disabled={isDeleteNodeDisabled}>Delete</button>
         <button onClick={saveWorkFlow} disabled={isFinishDisabled}>Finish</button>
+        {/* <Box sx={{ minWidth: 120 }}>
+        <FormControl fullWidth>
+        <InputLabel id="demo-simple-select-label">label</InputLabel>
+        <Select
+            labelId="demo-simple-select-label"
+            id="demo-simple-select"
+            value={val}
+            label='label'
+            onChange={handleChange}
+        >
+            <MenuItem value={'Assign carriers by cost'}>Assign carriers by cost</MenuItem>
+            <MenuItem value={'Assign to all carriers'}>Assign to all carriers</MenuItem>
+        </Select>
+        </FormControl>
+      </Box> */}
       </div>
     </div>
   );
