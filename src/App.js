@@ -42,20 +42,22 @@ const App= ()=> {
       setIsFinishDisabled(true);
     }
   },[nodes])
-
+  
   const defaultEdgeOptions = { animated: true };
   const onConnect = useCallback(
     (params) => setEdges((eds) => addEdge(params, eds)),
     [setEdges],
   );
   const addConfigurationNode=()=>{
-      setFlowData((prevData)=> {
-        const newConfiguration= (WorkFlowLabelsEnum.CONFIGURATION in prevData)? 
-                  [...prevData[WorkFlowLabelsEnum.CONFIGURATION],selectedConfiguration]:[selectedConfiguration] ;
-        return ({...prevData,[WorkFlowLabelsEnum.CONFIGURATION]:newConfiguration})
-      })
+      if(selectedConfiguration.length){
+        setFlowData((prevData)=> {
+          const newConfiguration= [...prevData[WorkFlowLabelsEnum.CONFIGURATION],selectedConfiguration];
+          return ({...prevData,[WorkFlowLabelsEnum.CONFIGURATION]:newConfiguration})
+        })
+        setSelectedConfiguration('');
+      }
       //when we add new configuraion node the dropdown list in the last one needs to be disabled otherwise options will be same
-      if(selectedConfiguration.length) nodes[nodes.length-1].data.editable=false; 
+      if(flowData.CONFIGURATION.length) nodes[nodes.length-1].data.editable=false; 
 
       const options=filterDropDownOptions();
       const newNode= {id:`${nodes.length}`,
@@ -66,7 +68,6 @@ const App= ()=> {
     const newEdge= {id:`e${nodes.length-1}-${nodes.length}`,source:`${nodes.length-1}`,target:`${nodes.length}`}
     setNodes((prevNodes)=> [...prevNodes,newNode]);
     setEdges((prevEdges)=> [...prevEdges,newEdge]);
-    setSelectedConfiguration('');
  }
  const filterDropDownOptions=()=>{
     const availableConfigurations= Object.values(WorkFlowConfigurationOptionsEnum);
@@ -79,18 +80,16 @@ const App= ()=> {
  const deleteConfigurationNode=()=>{
     setNodes((prevNodes)=>[...prevNodes.slice(0,-1)]);
     setEdges((prevEdges)=> [...prevEdges.slice(0,-1)]);
+    flowData.CONFIGURATION.pop();
+    if(flowData.CONFIGURATION.length) nodes[nodes.length-1].data.editable=true; 
  }
  const saveWorkFlow=()=>{
-  setFlowData((prevData)=> {
-    const newConfiguration=  [...prevData[WorkFlowLabelsEnum.CONFIGURATION],selectedConfiguration];
-    return ({...prevData,[WorkFlowLabelsEnum.CONFIGURATION]:newConfiguration})
-  })
-
+    setFlowData((prevData)=> {
+      const newConfiguration= [...prevData[WorkFlowLabelsEnum.CONFIGURATION],selectedConfiguration];
+      return ({...prevData,[WorkFlowLabelsEnum.CONFIGURATION]:newConfiguration})
+    })
  }
-//  const [val,setVal]=useState('');
-//  const handleChange=(event)=>{
-//     setVal(event.target.value);
-//  }
+ //update add, delete and finish button logic
  
   return (
     <div style={{display:'flex'}}>
@@ -104,26 +103,6 @@ const App= ()=> {
         onConnect={onConnect}
         defaultEdgeOptions={defaultEdgeOptions}
       />
-      </div>
-      <div>
-        <button onClick={addConfigurationNode}>Add</button>
-        <button onClick={deleteConfigurationNode} disabled={isDeleteNodeDisabled}>Delete</button>
-        <button onClick={saveWorkFlow} disabled={isFinishDisabled}>Finish</button>
-        {/* <Box sx={{ minWidth: 120 }}>
-        <FormControl fullWidth>
-        <InputLabel id="demo-simple-select-label">label</InputLabel>
-        <Select
-            labelId="demo-simple-select-label"
-            id="demo-simple-select"
-            value={val}
-            label='label'
-            onChange={handleChange}
-        >
-            <MenuItem value={'Assign carriers by cost'}>Assign carriers by cost</MenuItem>
-            <MenuItem value={'Assign to all carriers'}>Assign to all carriers</MenuItem>
-        </Select>
-        </FormControl>
-      </Box> */}
       </div>
     </div>
   );
