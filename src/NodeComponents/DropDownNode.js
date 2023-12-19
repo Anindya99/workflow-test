@@ -2,8 +2,8 @@
 import { Select } from 'antd';
 import { useCallback, useEffect, useState } from 'react';
 import { Handle, Position } from 'reactflow';
-import getValuesFromEnum from './utils/getValuesFromEnum';
-import WorkFlowLabelsEnum from './enums/WorkFlowLabelsEnum';
+import getValuesFromEnum from '../utils/getValuesFromEnum';
+import WorkFlowLabelsEnum from '../enums/WorkFlowLabelsEnum';
 
 
 function DropDownNode({ data, isConnectable=true }) {
@@ -26,6 +26,7 @@ function DropDownNode({ data, isConnectable=true }) {
           value={selectedValue}
           onChange={handleChange}
           style={{width:'150px'}}
+          disabled={data.disabled}
         >
           
           <option value="">Choose an option</option>

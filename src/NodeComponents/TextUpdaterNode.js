@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Handle, Position } from 'reactflow';
-import getValuesFromEnum from './utils/getValuesFromEnum';
+import getValuesFromEnum from '../utils/getValuesFromEnum';
 
 function TextUpdaterNode({ data, isConnectable }) {
   const [inputValue,setInputValue]= useState(data.value);
